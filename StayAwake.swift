@@ -58,6 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         defaults.register(defaults: ["enabled": true, "keepScreenOn": true])
         setAwake(defaults.bool(forKey: "enabled"), until: nil)
+        syncLaunchAtLogin()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -189,17 +190,59 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func toggleLaunchAtLogin() {
+        setLaunchAtLogin(SMAppService.mainApp.status != .enabled, quietly: false)
+    }
+
+    // MARK: Launch at login
+
+    // The choice is kept in "launchAtLogin" and re-applied on every launch:
+    // each rebuild re-signs the app, which can leave a stale login item.
+    // The first launch asks instead.
+    private func syncLaunchAtLogin() {
+        if defaults.object(forKey: "launchAtLogin") == nil {
+            askLaunchAtLogin()
+        } else if defaults.bool(forKey: "launchAtLogin") {
+            setLaunchAtLogin(true, quietly: true)
+        }
+    }
+
+    private func askLaunchAtLogin() {
+        activate()
+        let alert = NSAlert()
+        alert.messageText = "Open Stay Awake when you log in?"
+        alert.informativeText = "Stay Awake will start in the menu bar each time you log in. You can change this later from the menu (right-click the cup)."
+        alert.addButton(withTitle: "Open at Login")
+        alert.addButton(withTitle: "Not Now")
+        setLaunchAtLogin(alert.runModal() == .alertFirstButtonReturn, quietly: false)
+    }
+
+    private func setLaunchAtLogin(_ on: Bool, quietly: Bool) {
+        defaults.set(on, forKey: "launchAtLogin")
         do {
-            if SMAppService.mainApp.status == .enabled {
-                try SMAppService.mainApp.unregister()
-            } else {
+            if on {
                 try SMAppService.mainApp.register()
+            } else if SMAppService.mainApp.status != .notRegistered {
+                try SMAppService.mainApp.unregister()
             }
         } catch {
+            guard !quietly else { return }
+            activate()
             let alert = NSAlert()
             alert.messageText = "Couldn't change Launch at Login"
             alert.informativeText = "\(error.localizedDescription)\n\nYou can add Stay Awake in System Settings → General → Login Items instead."
             alert.runModal()
+            return
+        }
+        if on && SMAppService.mainApp.status == .requiresApproval && !quietly {
+            SMAppService.openSystemSettingsLoginItems()
+        }
+    }
+
+    private func activate() {
+        if #available(macOS 14, *) {
+            NSApp.activate()
+        } else {
+            NSApp.activate(ignoringOtherApps: true)
         }
     }
 }

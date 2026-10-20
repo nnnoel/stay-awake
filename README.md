@@ -5,10 +5,6 @@ A tiny macOS menu bar app: a coffee cup you click to keep your Mac awake.
 - **Filled cup**: the Mac won't idle-sleep, and the screen stays on (configurable).
 - **Outlined, dimmed cup**: normal macOS sleep behavior.
 
-It was built to stop long-running work (AI coding sessions, builds, downloads,
-remote shells) from being cut off when an aggressive sleep timer puts the Mac
-to sleep and drops its network connections.
-
 ## Features
 
 - **Click** the cup to toggle on or off.
@@ -21,7 +17,7 @@ to sleep and drops its network connections.
   - **Quit Stay Awake**
 - Remembers your on/off choice and **Keep Screen On** across launches. Timed
   sessions don't change the remembered choice.
-- Starts **on** the first time it runs.
+- Starts **on** the first time it runs, and asks once whether to open at login.
 
 ## How it works
 
@@ -67,11 +63,16 @@ The script:
 
 1. compiles `StayAwake.swift` with `swiftc` (one file, no dependencies)
 2. assembles `build/Stay Awake.app` with `Info.plist` (`LSUIElement`, so there's no Dock icon)
-3. ad-hoc code-signs the app
-4. installs it into `~/Applications`, replacing any running copy, and launches it
+3. draws the app icon with `make-icon.swift` and packs it into `AppIcon.icns`
+4. ad-hoc code-signs the app
+5. installs it into `~/Applications`, replacing any running copy, and launches it
 
-To start it automatically, right-click the cup → **Launch at Login**, or add it
-under System Settings → General → Login Items.
+## Launch at login
+
+The first launch asks whether to open Stay Awake at login. Change it any time
+with right-click → **Launch at Login**; it shows up in System Settings →
+General → Login Items. The choice is remembered and re-applied on each launch,
+so the login item keeps working after a rebuild re-signs the app.
 
 ## Uninstall
 
@@ -95,4 +96,5 @@ under System Settings → General → Login Items.
 |---|---|
 | `StayAwake.swift` | The whole app: power assertions, menu bar item, menu |
 | `Info.plist` | Bundle metadata (menu-bar-only app, bundle id `dev.noel.stayawake`) |
+| `make-icon.swift` | Draws the app icon (a cup on an Iceberg Dark tile) as a 1024px PNG |
 | `build.sh` | Build, sign, install and launch |
