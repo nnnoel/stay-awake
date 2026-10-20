@@ -62,10 +62,9 @@ Lock it manually (Control-Command-Q) when you step away.
 The script:
 
 1. compiles `StayAwake.swift` with `swiftc` (one file, no dependencies)
-2. assembles `build/Stay Awake.app` with `Info.plist` (`LSUIElement`, so there's no Dock icon)
-3. draws the app icon with `make-icon.swift` and packs it into `AppIcon.icns`
-4. ad-hoc code-signs the app
-5. installs it into `~/Applications`, replacing any running copy, and launches it
+2. assembles `build/Stay Awake.app` with `Info.plist` (`LSUIElement`, so there's no Dock icon) and `AppIcon.icns`
+3. ad-hoc code-signs the app
+4. installs it into `~/Applications`, replacing any running copy, and launches it
 
 ## Launch at login
 
@@ -96,7 +95,7 @@ so the login item keeps working after a rebuild re-signs the app.
 |---|---|
 | `StayAwake.swift` | The whole app: power assertions, menu bar item, menu |
 | `Info.plist` | Bundle metadata (menu-bar-only app, bundle id `dev.noel.stayawake`) |
-| `make-icon.swift` | Draws the app icon (a cup on an Iceberg Dark tile) as a 1024px PNG |
+| `AppIcon.icns` | The app icon |
 | `build.sh` | Build, sign, install and launch |
 
 ## License
