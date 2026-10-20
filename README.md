@@ -98,3 +98,7 @@ so the login item keeps working after a rebuild re-signs the app.
 | `Info.plist` | Bundle metadata (menu-bar-only app, bundle id `dev.noel.stayawake`) |
 | `make-icon.swift` | Draws the app icon (a cup on an Iceberg Dark tile) as a 1024px PNG |
 | `build.sh` | Build, sign, install and launch |
+
+## License
+
+MIT. See [LICENSE](LICENSE).
